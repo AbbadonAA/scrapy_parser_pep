@@ -1,6 +1,8 @@
-import scrapy
 import re
 
+import scrapy
+
+from pep_parse.items import PepParseItem
 
 NUM_NAM = r'PEP\s(?P<number>\d+)\W+(?P<name>.+)$'
 
@@ -8,7 +10,7 @@ NUM_NAM = r'PEP\s(?P<number>\d+)\W+(?P<name>.+)$'
 class PepSpider(scrapy.Spider):
     name = 'pep'
     allowed_domains = ['peps.python.org']
-    start_urls = ['http://peps.python.org/']
+    start_urls = ['https://peps.python.org/']
 
     def parse_pep(self, response):
         title = response.css('h1.page-title::text').get().replace('"', '')
@@ -17,11 +19,12 @@ class PepSpider(scrapy.Spider):
             '//*[contains(text(), "Status")]//'
             'following-sibling::node()[2]/text()'
         ).get()
-        yield {
+        data = {
             'number': number,
             'name': name,
             'status': status,
         }
+        yield PepParseItem(data)
 
     def parse(self, response):
         pep_list = response.css('section[id="numerical-index"]')
