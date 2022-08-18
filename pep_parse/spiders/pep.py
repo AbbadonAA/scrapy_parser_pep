@@ -5,6 +5,8 @@ import scrapy
 from pep_parse.items import PepParseItem
 
 NUM_NAM = r'PEP\s(?P<number>\d+)\W+(?P<name>.+)$'
+STATUS_XPATH = '//*[contains(text(), "Status")]'
+NEXT_SIBLING = '//following-sibling::node()[{}]/text()'.format('2')
 
 
 class PepSpider(scrapy.Spider):
@@ -15,10 +17,7 @@ class PepSpider(scrapy.Spider):
     def parse_pep(self, response):
         title = response.css('h1.page-title::text').get().replace('"', '')
         number, name = re.search(NUM_NAM, title).groups()
-        status = response.xpath(
-            '//*[contains(text(), "Status")]//'
-            'following-sibling::node()[2]/text()'
-        ).get()
+        status = response.xpath(f'{STATUS_XPATH}{NEXT_SIBLING}').get()
         data = {
             'number': number,
             'name': name,
