@@ -27,6 +27,7 @@ class PepSpider(scrapy.Spider):
 
     def parse(self, response):
         pep_list = response.css('section[id="numerical-index"]')
-        pep_links = pep_list.css('a[class="pep reference internal"]')
+        pep_links = pep_list.css(
+            'a[class="pep reference internal"]::attr(href)').getall()
         for pep_link in pep_links:
-            yield response.follow(pep_link, callback=self.parse_pep)
+            yield response.follow(f'{pep_link}/', callback=self.parse_pep)
