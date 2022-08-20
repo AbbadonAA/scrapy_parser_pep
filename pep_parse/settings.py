@@ -16,3 +16,5 @@ FEEDS = {
         'overwrite': True
     },
 }
+
+FEED_URI_PARAMS = 'pep_parse.utils.uri_params'
